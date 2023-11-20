@@ -1,0 +1,26 @@
+<%- include("header") %>
+
+<div class="row">
+  <div class="col-2"></div>
+  <div class="col-8">
+    <table class="table table-hover text-center">
+      <thead>
+        <tr>
+          <th>IP</th>
+          <th>MAC</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (const device of vars.devices) { %>
+          <tr>
+            <td> <%= device.ip %> </td>
+            <td> <%= device.mac %> </td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+  <div class="col-2"></div>
+</div>
+
+<%- include("footer") %>

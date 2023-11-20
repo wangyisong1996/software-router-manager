@@ -1,0 +1,49 @@
+<%- include("header") %>
+
+<div class="row mb-3"></div>
+<div class="row text-center">
+  <div class="col-3"></div>
+  <!-- password -->
+  <div class="mb-3 col-6">
+    <input type="password" class="form-control" id="password" placeholder="Password" onkeydown="if (event.keyCode == 13) submit()" />
+  </div>
+  <div class="col-3"></div>
+</div>
+<div class="row text-center">
+  <div class="col-3"></div>
+  <!-- submit button -->
+  <div class="mb-3 col-6">
+    <button id="submit" class="btn btn-primary" onclick="submit()">Submit</button>
+  </div>
+  <div class="col-3"></div>
+</div>
+
+<script>
+  const submit = async () => {
+    const password = document.getElementById("password").value;
+    const submit_button = document.getElementById("submit");
+    submit_button.disabled = true;
+    
+    $.ajax({
+      url: "/api/login",
+      type: "POST",
+      data: {
+        password,
+      },
+      success: (data) => {
+        if (data.ok) {
+          window.location.href = "/";
+        } else {
+          alert(data.error);
+          submit_button.disabled = false;
+        }
+      },
+      error: (err) => {
+        alert("Network error. Please try again later.");
+        submit_button.disabled = false;
+      },
+    });
+  };
+</script>
+
+<%- include("footer") %>

@@ -1,0 +1,101 @@
+<%- include("header") %>
+
+<% if (!vars.error) { %>
+
+<div class="row">
+  <div class="col-12">
+    <table class="table table-hover text-center">
+      <thead>
+        <tr>
+          <th>IP</th>
+          <th>MAC</th>
+          <th>Comment</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (const host of vars.hosts) { %>
+          <tr style="vertical-align: middle;">
+            <td><%= host.ip %></td>
+            <td><%= host.mac %></td>
+            <td><%= host.comment %></td>
+            <td>
+              <button class="btn btn-danger btn-sm" onclick="deleteHost('<%= host.ip %>')">Delete</button>
+            </td>
+          </tr>
+        <% } %>
+        <tr style="vertical-align: middle;">
+          <td>
+            <input type="text" class="form-control" id="ip" placeholder="IP" />
+          </td>
+          <td>
+            <input type="text" class="form-control" id="mac" placeholder="MAC" />
+          </td>
+          <td>
+            <input type="text" class="form-control" id="comment" placeholder="Comment" />
+          </td>
+          <td>
+            <button class="btn btn-primary btn-sm" onclick="addHost()">Add</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const addHost = async () => {
+    const ip = document.getElementById("ip").value;
+    const mac = document.getElementById("mac").value;
+    const comment = document.getElementById("comment").value;
+
+    $.ajax({
+      url: "/api/dhcp/add",
+      type: "POST",
+      data: {
+        ip,
+        mac,
+        comment,
+      },
+      success: (data) => {
+        if (data.ok) {
+          alert("Host added successfully.");
+          window.location.reload();
+        } else {
+          alert(data.error);
+        }
+      },
+      error: (err) => {
+        alert("Network error. Please try again later.");
+      },
+    });
+  };
+
+  const deleteHost = async (ip) => {
+    if (!confirm(`Are you sure to delete host ${ip}?`)) {
+      return;
+    }
+    $.ajax({
+      url: "/api/dhcp/delete",
+      type: "POST",
+      data: {
+        ip,
+      },
+      success: (data) => {
+        if (data.ok) {
+          alert("Host deleted successfully.");
+          window.location.reload();
+        } else {
+          alert(data.error);
+        }
+      },
+      error: (err) => {
+        alert("Network error. Please try again later.");
+      },
+    });
+  };
+</script>
+
+<% } %>
+
+<%- include("footer") %>

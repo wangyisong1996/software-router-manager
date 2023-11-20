@@ -1,0 +1,122 @@
+<%- include("header") %>
+
+<% if (!vars.error) { %>
+
+<div class="row">
+  <div class="col-12">
+    <table class="table table-hover text-center">
+      <thead>
+        <tr>
+          <th>Public Port</th>
+          <th>Protocol</th>
+          <th>Private IP</th>
+          <th>Private Port</th>
+          <th>Comment</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for (const rule of vars.rules) { %>
+          <tr style="vertical-align: middle;">
+            <td><%= rule.public_port %></td>
+            <td><%= rule.protocol.toUpperCase() %></td>
+            <td><%= rule.private_ip %></td>
+            <td><%= rule.private_port %></td>
+            <td><%= rule.comment_raw %></td>
+            <td>
+              <button class="btn btn-danger btn-sm" onclick="deleteRule('<%= rule.public_port %>','<%= rule.protocol %>','<%= rule.private_ip %>','<%= rule.private_port %>', '<%= rule.comment_processed %>')">Delete</button>
+            </td>
+          </tr>
+        <% } %>
+        <tr style="vertical-align: middle;">
+          <td>
+            <input type="text" class="form-control" id="public_port" placeholder="Public Port" />
+          </td>
+          <td>
+            <select class="form-select" id="protocol">
+              <option value="tcp">TCP</option>
+              <option value="udp">UDP</option>
+            </select>
+          </td>
+          <td>
+            <input type="text" class="form-control" id="private_ip" placeholder="Private IP" />
+          </td>
+          <td>
+            <input type="text" class="form-control" id="private_port" placeholder="Private Port" />
+          </td>
+          <td>
+            <input type="text" class="form-control" id="comment" placeholder="Comment" />
+          </td>
+          <td>
+            <button class="btn btn-primary btn-sm" onclick="addRule()">Add</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const addRule = async () => {
+    const public_port = document.getElementById("public_port").value;
+    const protocol = document.getElementById("protocol").value;
+    const private_ip = document.getElementById("private_ip").value;
+    const private_port = document.getElementById("private_port").value;
+    const comment = document.getElementById("comment").value;
+
+    $.ajax({
+      url: "/api/port-forwarding/add",
+      type: "POST",
+      data: {
+        public_port,
+        protocol,
+        private_ip,
+        private_port,
+        comment,
+      },
+      success: (data) => {
+        if (data.ok) {
+          alert("Rule added successfully.");
+          window.location.reload();
+        } else {
+          alert(data.error);
+        }
+      },
+      error: (err) => {
+        alert("Network error. Please try again later.");
+      },
+    });
+  };
+
+  const deleteRule = async (public_port, protocol, private_ip, private_port, comment) => {
+    if (!confirm(`Are you sure to delete rule ${public_port} (${protocol.toUpperCase()}) -> ${private_ip}:${private_port}?`)) {
+      return;
+    }
+    $.ajax({
+      url: "/api/port-forwarding/delete",
+      type: "POST",
+      data: {
+        public_port,
+        protocol,
+        private_ip,
+        private_port,
+        comment,
+      },
+      success: (data) => {
+        if (data.ok) {
+          alert("Rule deleted successfully.");
+          window.location.reload();
+        } else {
+          alert(data.error);
+        }
+      },
+      error: (err) => {
+        alert("Network error. Please try again later.");
+      },
+    });
+  };
+</script>
+
+<% } %>
+
+<%- include("footer") %>
