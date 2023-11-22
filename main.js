@@ -343,6 +343,9 @@ const get_port_forwarding_rules = async () => {
         let comment_raw = "";
         let comment_processed = "";
         if (has_comment) {
+            if (!arr[11].startsWith(`"`)) {
+                arr[11] = `"` + arr[11] + `"`;
+            }
             for (let i = 11; i < arr.length; i++) {
                 if (arr[i].endsWith(`"`) && !arr[i].endsWith(`\\"`)) {
                     comment_processed = arr.slice(11, i + 1).join(" ").slice(1, -1);
